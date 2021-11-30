@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/CoffeeListFragment">
+
+    <fragment
+        android:id="@+id/FragmentLogin"
+        android:name="com.adab.myapplication.auth.login.LoginFragment"
+        android:label="@string/login"
+        tools:layout="@layout/fragment_login" />
+
+    <fragment
+        android:id="@+id/CoffeeListFragment"
+        android:name="com.adab.myapplication.coffees.coffees.CoffeeListFragment"
+        android:label="@string/item_list_fragment_label"
+        tools:layout="@layout/fragment_coffee_list" >
+
+        <action
+            android:id="@+id/action_CoffeeEditFragment_to_CoffeeListFragment"
+            app:destination="@id/CoffeeEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/CoffeeEditFragment"
+        android:name="com.adab.myapplication.coffees.coffee.CoffeeEditFragment"
+        android:label="@string/item_edit_fragment_label"
+        tools:layout="@layout/fragment_coffee_edit" >
+
+        <action
+            android:id="@+id/action_CoffeeEditFragment_to_CoffeeListFragment"
+            app:destination="@id/CoffeeListFragment" />
+    </fragment>
+</navigation>
