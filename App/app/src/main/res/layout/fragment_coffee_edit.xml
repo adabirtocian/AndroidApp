@@ -13,11 +13,19 @@
         android:indeterminate="true"
         android:visibility="gone" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="origin name:"
+        android:textSize="50px"
+        android:layout_marginTop="10dp"/>
+
     <EditText
         android:id="@+id/item_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="120dp"
+        android:text="coffee" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -25,6 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_menu_save" />
+        app:srcCompat="@android:drawable/ic_menu_save"/>
 
 </FrameLayout>

@@ -13,7 +13,7 @@ import com.adab.myapplication.core.TAG
 import com.adab.myapplication.core.Result
 
 class CoffeeEditViewModel : ViewModel() {
-    private val mutableItem = MutableLiveData<Coffee>().apply { value = Coffee("", "", Date(), true) }
+    private val mutableItem = MutableLiveData<Coffee>().apply { value = Coffee("", "", true) }
     private val mutableFetching = MutableLiveData<Boolean>().apply { value = false }
     private val mutableCompleted = MutableLiveData<Boolean>().apply { value = false }
     private val mutableException = MutableLiveData<Exception>().apply { value = null }
