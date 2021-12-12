@@ -46,10 +46,12 @@ object CoffeeRepository {
     suspend fun save(coffee: Coffee): Result<Coffee> {
         try {
             Log.v(TAG, "save - started")
-            val createdItem = CoffeeApi.service.create(coffee)
+            Log.v(TAG, coffee.toString());
+            val toAddCoffee = CoffeeWrapper(coffee.originName, coffee.popular, coffee.roastedDate)
+            val createdCoffee = CoffeeApi.service.create(toAddCoffee)
             Log.v(TAG, "save - succeeded")
-            cachedItems?.add(createdItem)
-            return Result.Success(createdItem)
+            cachedItems?.add(createdCoffee)
+            return Result.Success(createdCoffee)
         } catch (e: Exception) {
             Log.w(TAG, "save - failed", e)
             return Result.Error(e)

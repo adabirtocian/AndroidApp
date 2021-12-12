@@ -26,8 +26,6 @@ router.get("/:popular", async (ctx) => {
 });
 
 router.get('/:index/:limit', async (ctx) => {
-    console.log(ctx.params.index);
-    console.log("limit", ctx.params.limit);
     const response = ctx.response;
     const userId = ctx.state.user._id;
     const res = (await coffeeStore.find({ userId }))
@@ -57,6 +55,7 @@ const createCoffee = async (ctx, coffee, response) => {
         coffee.userId = userId;
         response.body = await coffeeStore.insert(coffee);
         response.status = 201; // created
+        console.log(response.body);
         broadcast(userId, { type: 'created', payload: response.body });
     } catch (err) {
         response.body = { message: err.message };

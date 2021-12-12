@@ -15,6 +15,7 @@ export class CoffeeStore {
     }
 
     async insert(coffee) {
+        console.log("Store: "+ JSON.stringify(coffee));
         let coffeeOrigin = coffee.originName;
         if (!coffeeOrigin) { // validation
             throw new Error('Missing originName property')
