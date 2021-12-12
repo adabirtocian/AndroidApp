@@ -25,7 +25,7 @@ class CoffeeListViewModel : ViewModel() {
     fun createItem(position: Int): Unit {
         val list = mutableListOf<Coffee>()
         list.addAll(mutableItems.value!!)
-        list.add(Coffee(position.toString(), "Coffee", true))
+        list.add(Coffee(position.toString(), "Coffee", "popular", ""))
         mutableItems.value = list
     }
 

@@ -13,7 +13,7 @@ import com.adab.myapplication.core.TAG
 import com.adab.myapplication.core.Result
 
 class CoffeeEditViewModel : ViewModel() {
-    private val mutableItem = MutableLiveData<Coffee>().apply { value = Coffee("", "", true) }
+    private val mutableItem = MutableLiveData<Coffee>().apply { value = Coffee("", "", "", "") }
     private val mutableFetching = MutableLiveData<Boolean>().apply { value = false }
     private val mutableCompleted = MutableLiveData<Boolean>().apply { value = false }
     private val mutableException = MutableLiveData<Exception>().apply { value = null }
@@ -42,11 +42,13 @@ class CoffeeEditViewModel : ViewModel() {
         }
     }
 
-    fun saveOrUpdateItem(text: String) {
+    fun saveOrUpdateItem(originName: String, popular: String, roastedDate: String) {
         viewModelScope.launch {
             Log.v(TAG, "saveOrUpdateItem...");
             val item = mutableItem.value ?: return@launch
-            item.originName = text
+            item.originName = originName
+            item.popular = popular
+            item.roastedDate = roastedDate
             mutableFetching.value = true
             mutableException.value = null
             val result: Result<Coffee>

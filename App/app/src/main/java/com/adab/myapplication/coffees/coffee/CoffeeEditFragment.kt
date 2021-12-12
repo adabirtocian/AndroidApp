@@ -44,7 +44,9 @@ class CoffeeEditFragment : Fragment() {
         setupViewModel()
         binding.fab.setOnClickListener {
             Log.v(TAG, "save item")
-            viewModel.saveOrUpdateItem(binding.itemText.text.toString())
+            viewModel.saveOrUpdateItem(binding.itemText.text.toString(),
+                binding.itemPopular.text.toString(),
+                binding.itemDate.text.toString())
         }
         binding.itemText.setText(itemId)
     }
@@ -60,6 +62,8 @@ class CoffeeEditFragment : Fragment() {
         viewModel.item.observe(viewLifecycleOwner) { item ->
             Log.v(TAG, "update items")
             binding.itemText.setText(item.originName)
+            binding.itemPopular.setText(item.popular)
+            binding.itemDate.setText(item.roastedDate)
         }
         viewModel.fetching.observe(viewLifecycleOwner) { fetching ->
             Log.v(TAG, "update fetching")
