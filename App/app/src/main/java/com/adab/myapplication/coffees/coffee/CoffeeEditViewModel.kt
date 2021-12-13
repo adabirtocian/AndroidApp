@@ -1,69 +1,56 @@
 package com.adab.myapplication.coffees.coffee
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.adab.myapplication.coffees.data.Coffee
 import com.adab.myapplication.coffees.data.CoffeeRepository
+import com.adab.myapplication.coffees.data.local.CoffeesDatabase
 import kotlinx.coroutines.launch
-import java.util.*
 import com.adab.myapplication.core.TAG
 import com.adab.myapplication.core.Result
 
-class CoffeeEditViewModel : ViewModel() {
-    private val mutableItem = MutableLiveData<Coffee>().apply { value = Coffee("", "", "", "") }
+class CoffeeEditViewModel(application: Application) : AndroidViewModel(application)  {
     private val mutableFetching = MutableLiveData<Boolean>().apply { value = false }
     private val mutableCompleted = MutableLiveData<Boolean>().apply { value = false }
     private val mutableException = MutableLiveData<Exception>().apply { value = null }
 
-    val item: LiveData<Coffee> = mutableItem
     val fetching: LiveData<Boolean> = mutableFetching
     val fetchingError: LiveData<Exception> = mutableException
     val completed: LiveData<Boolean> = mutableCompleted
 
-    fun loadItem(itemId: String) {
-        viewModelScope.launch {
-            Log.i(TAG, "loadItem...")
-            mutableFetching.value = true
-            mutableException.value = null
-            when (val result = CoffeeRepository.load(itemId)) {
-                is Result.Success -> {
-                    Log.d(TAG, "loadItem succeeded");
-                    mutableItem.value = result.data
-                }
-                is Result.Error -> {
-                    Log.w(TAG, "loadItem failed", result.exception);
-                    mutableException.value = result.exception
-                }
-            }
-            mutableFetching.value = false
-        }
+    val coffeeRepository: CoffeeRepository
+
+    init {
+        val coffeeDao = CoffeesDatabase.getDatabase(application, viewModelScope).coffeeDao()
+        coffeeRepository = CoffeeRepository((coffeeDao))
     }
 
-    fun saveOrUpdateItem(originName: String, popular: String, roastedDate: String) {
+    fun getCoffeeById(cofffeId: String): LiveData<Coffee>{
+        Log.v(TAG, "getCoffeeById")
+        return coffeeRepository.getById(cofffeId)
+    }
+
+    fun saveOrUpdateItem(coffee: Coffee) {
         viewModelScope.launch {
             Log.v(TAG, "saveOrUpdateItem...");
-            val item = mutableItem.value ?: return@launch
-            item.originName = originName
-            item.popular = popular
-            item.roastedDate = roastedDate
             mutableFetching.value = true
             mutableException.value = null
             val result: Result<Coffee>
-            if (item._id.isNotEmpty()) {
-                result = CoffeeRepository.update(item)
+
+            if(coffee._id.isNotEmpty()) {
+                result = coffeeRepository.update(coffee)
             } else {
-                result = CoffeeRepository.save(item)
+                result = coffeeRepository.save(coffee)
             }
-            when (result) {
+
+            when(result) {
                 is Result.Success -> {
-                    Log.d(TAG, "saveOrUpdateItem succeeded");
-                    mutableItem.value = result.data
+                    Log.d(TAG, "saveOrUpdateCoffee succeeded");
                 }
+
                 is Result.Error -> {
-                    Log.w(TAG, "saveOrUpdateItem failed", result.exception);
+                    Log.w(TAG, "saveOrUpdateCoffee failed", result.exception);
                     mutableException.value = result.exception
                 }
             }

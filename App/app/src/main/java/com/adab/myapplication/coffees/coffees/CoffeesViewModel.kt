@@ -1,46 +1,42 @@
 package com.adab.myapplication.coffees.coffees
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.adab.myapplication.coffees.data.Coffee
 import com.adab.myapplication.coffees.data.CoffeeRepository
+import com.adab.myapplication.coffees.data.local.CoffeesDatabase
 import kotlinx.coroutines.launch
-import java.util.*
 import com.adab.myapplication.core.TAG
 import com.adab.myapplication.core.Result
 
-
-class CoffeeListViewModel : ViewModel() {
-    private val mutableItems = MutableLiveData<List<Coffee>>().apply { value = emptyList() }
+class CoffeeListViewModel(application: Application) : AndroidViewModel(application) {
     private val mutableLoading = MutableLiveData<Boolean>().apply { value = false }
     private val mutableException = MutableLiveData<Exception>().apply { value = null }
 
-    val items: LiveData<List<Coffee>> = mutableItems
+    val coffees: LiveData<List<Coffee>>
     val loading: LiveData<Boolean> = mutableLoading
     val loadingError: LiveData<Exception> = mutableException
 
-    fun createItem(position: Int): Unit {
-        val list = mutableListOf<Coffee>()
-        list.addAll(mutableItems.value!!)
-        list.add(Coffee(position.toString(), "Coffee", "popular", ""))
-        mutableItems.value = list
+    val coffeeRepository: CoffeeRepository
+
+    init {
+        val coffeeDao = CoffeesDatabase.getDatabase(application, viewModelScope).coffeeDao()
+        coffeeRepository = CoffeeRepository(coffeeDao)
+        coffees = coffeeRepository.coffees
     }
 
-    fun loadItems() {
+    fun refresh() {
         viewModelScope.launch {
-            Log.v(TAG, "loadItems...");
+            Log.v(TAG, "refresh...");
             mutableLoading.value = true
             mutableException.value = null
-            when (val result = CoffeeRepository.loadAll()) {
+            when (val result = coffeeRepository.refresh()) {
                 is Result.Success -> {
-                    Log.d(TAG, "loadItems succeeded");
-                    mutableItems.value = result.data
+                    Log.d(TAG, "refresh succeeded");
                 }
                 is Result.Error -> {
-                    Log.w(TAG, "loadItems failed", result.exception);
+                    Log.w(TAG, "refresh failed", result.exception);
                     mutableException.value = result.exception
                 }
             }

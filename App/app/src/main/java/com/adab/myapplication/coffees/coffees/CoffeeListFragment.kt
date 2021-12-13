@@ -16,8 +16,8 @@ import com.adab.myapplication.core.TAG
 
 class CoffeeListFragment : Fragment() {
     private var _binding: FragmentCoffeeListBinding? = null
-    private lateinit var itemListAdapter: CoffeeListAdapter
-    private lateinit var itemsModel: CoffeeListViewModel
+    private lateinit var coffeeListAdapter: CoffeeListAdapter
+    private lateinit var coffeesModel: CoffeeListViewModel
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -38,31 +38,31 @@ class CoffeeListFragment : Fragment() {
         }
         setupItemList()
         binding.fab.setOnClickListener {
-            Log.v(TAG, "add new item")
+            Log.v(TAG, "add new coffee")
             findNavController().navigate(R.id.CoffeeEditFragment)
         }
     }
 
     private fun setupItemList() {
-        itemListAdapter = CoffeeListAdapter(this)
-        binding.itemList.adapter = itemListAdapter
-        itemsModel = ViewModelProvider(this).get(CoffeeListViewModel::class.java)
-        itemsModel.items.observe(viewLifecycleOwner, { value ->
-            Log.i(TAG, "update items")
-            itemListAdapter.items = value
+        coffeeListAdapter = CoffeeListAdapter(this)
+        binding.itemList.adapter = coffeeListAdapter
+        coffeesModel = ViewModelProvider(this).get(CoffeeListViewModel::class.java)
+        coffeesModel.coffees.observe(viewLifecycleOwner, { value ->
+            Log.i(TAG, "update coffees")
+            coffeeListAdapter.items = value
         })
-        itemsModel.loading.observe(viewLifecycleOwner, { loading ->
+        coffeesModel.loading.observe(viewLifecycleOwner, { loading ->
             Log.i(TAG, "update loading")
             binding.progress.visibility = if (loading) View.VISIBLE else View.GONE
         })
-        itemsModel.loadingError.observe(viewLifecycleOwner, { exception ->
+        coffeesModel.loadingError.observe(viewLifecycleOwner, { exception ->
             if (exception != null) {
                 Log.i(TAG, "update loading error")
                 val message = "Loading exception ${exception.message}"
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
             }
         })
-        itemsModel.loadItems()
+        coffeesModel.refresh()
     }
 
     override fun onDestroyView() {

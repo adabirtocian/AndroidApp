@@ -9,16 +9,18 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.adab.myapplication.coffees.data.Coffee
 import com.adab.myapplication.core.TAG
 import com.adab.myapplication.databinding.FragmentCoffeeEditBinding
 
 class CoffeeEditFragment : Fragment() {
     companion object {
-        const val ITEM_ID = "ITEM_ID"
+        const val COFFEE_ID = "COFFEE_ID"
     }
 
     private lateinit var viewModel: CoffeeEditViewModel
-    private var itemId: String? = null
+    private var coffeeId: String? = null
+    private var coffee: Coffee? = null
 
     private var _binding: FragmentCoffeeEditBinding? = null
 
@@ -30,8 +32,8 @@ class CoffeeEditFragment : Fragment() {
     ): View? {
         Log.i(TAG, "onCreateView")
         arguments?.let {
-            if (it.containsKey(ITEM_ID)) {
-                itemId = it.getString(ITEM_ID).toString()
+            if (it.containsKey(COFFEE_ID)) {
+                coffeeId = it.getString(COFFEE_ID).toString()
             }
         }
         _binding = FragmentCoffeeEditBinding.inflate(inflater, container, false)
@@ -44,11 +46,14 @@ class CoffeeEditFragment : Fragment() {
         setupViewModel()
         binding.fab.setOnClickListener {
             Log.v(TAG, "save item")
-            viewModel.saveOrUpdateItem(binding.itemText.text.toString(),
-                binding.itemPopular.text.toString(),
-                binding.itemDate.text.toString())
+            val c = coffee
+            if(c != null) {
+                c.originName = binding.itemText.text.toString()
+                c.popular = binding.itemPopular.text.toString()
+                c.roastedDate = binding.itemDate.text.toString()
+            }
         }
-        binding.itemText.setText(itemId)
+        binding.itemText.setText(coffeeId)
     }
 
     override fun onDestroyView() {
@@ -59,17 +64,12 @@ class CoffeeEditFragment : Fragment() {
 
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this).get(CoffeeEditViewModel::class.java)
-        viewModel.item.observe(viewLifecycleOwner) { item ->
-            Log.v(TAG, "update items")
-            binding.itemText.setText(item.originName)
-            binding.itemPopular.setText(item.popular)
-            binding.itemDate.setText(item.roastedDate)
-        }
-        viewModel.fetching.observe(viewLifecycleOwner) { fetching ->
+        viewModel.fetching.observe(viewLifecycleOwner, { fetching ->
             Log.v(TAG, "update fetching")
             binding.progress.visibility = if (fetching) View.VISIBLE else View.GONE
-        }
-        viewModel.fetchingError.observe(viewLifecycleOwner) { exception ->
+        })
+
+        viewModel.fetchingError.observe(viewLifecycleOwner, { exception ->
             if (exception != null) {
                 Log.v(TAG, "update fetching error")
                 val message = "Fetching exception ${exception.message}"
@@ -78,16 +78,26 @@ class CoffeeEditFragment : Fragment() {
                     Toast.makeText(parentActivity, message, Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-        viewModel.completed.observe(viewLifecycleOwner) { completed ->
+        })
+        viewModel.completed.observe(viewLifecycleOwner, { completed ->
             if (completed) {
                 Log.v(TAG, "completed, navigate back")
                 findNavController().navigateUp()
             }
-        }
-        val id = itemId
-        if (id != null) {
-            viewModel.loadItem(id)
+        })
+        val id = coffeeId
+        if (id == null) {
+            coffee = Coffee("","","","", "")
+        } else {
+            viewModel.getCoffeeById(id).observe(viewLifecycleOwner, {
+                Log.v(TAG, "update coffees")
+                if( it != null) {
+                    coffee = it
+                    binding.itemText.setText(it.originName)
+                    binding.itemPopular.setText(it.popular)
+                    binding.itemDate.setText(it.roastedDate)
+                }
+            })
         }
     }
 }

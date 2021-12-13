@@ -1,76 +1,75 @@
 package com.adab.myapplication.coffees.data
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import com.adab.myapplication.coffees.data.local.CoffeeDao
 import com.adab.myapplication.coffees.data.remote.CoffeeApi
 import com.adab.myapplication.core.Result
-import com.adab.myapplication.core.TAG
+import android.annotation.SuppressLint
+import java.lang.Exception
+import androidx.work.*
 
-object CoffeeRepository {
-    private var cachedItems: MutableList<Coffee>? = null;
+class CoffeeRepository(private val coffeeDao: CoffeeDao) {
 
-    suspend fun loadAll(): Result<List<Coffee>> {
-        if (cachedItems != null) {
-            Log.v(TAG, "loadAll - return cached coffees")
-            return Result.Success(cachedItems as List<Coffee>);
-        }
+    val coffees = coffeeDao.getAll()
+
+    suspend fun refresh(): Result<Boolean> {
         try {
-            Log.v(TAG, "loadAll - started")
             val coffees = CoffeeApi.service.find()
-            Log.v(TAG, "loadAll - succeeded")
-            cachedItems = mutableListOf()
-            cachedItems?.addAll(coffees)
-            return Result.Success(cachedItems as List<Coffee>)
-        } catch (e: Exception) {
-            Log.w(TAG, "loadAll - failed", e)
+            for(coffee in coffees) {
+                coffeeDao.insert(coffee)
+            }
+
+            return Result.Success(true)
+        }catch (e: Exception) {
             return Result.Error(e)
         }
     }
 
-    suspend fun load(coffeeId: String): Result<Coffee> {
-        val coffee = cachedItems?.find { it._id == coffeeId }
-        if (coffee != null) {
-            Log.v(TAG, "load - return cached coffee")
-            return Result.Success(coffee)
-        }
-        try {
-            Log.v(TAG, "load - started")
-            val coffeeRead = CoffeeApi.service.read(coffeeId)
-            Log.v(TAG, "load - succeeded")
-            return Result.Success(coffeeRead)
-        } catch (e: Exception) {
-            Log.w(TAG, "load - failed", e)
-            return Result.Error(e)
-        }
+    fun getById(coffeeId: String): LiveData<Coffee> {
+        return coffeeDao.getById(coffeeId)
     }
 
     suspend fun save(coffee: Coffee): Result<Coffee> {
-        try {
-            Log.v(TAG, "save - started")
-            Log.v(TAG, coffee.toString());
-            val toAddCoffee = CoffeeWrapper(coffee.originName, coffee.popular, coffee.roastedDate)
-            val createdCoffee = CoffeeApi.service.create(toAddCoffee)
-            Log.v(TAG, "save - succeeded")
-            cachedItems?.add(createdCoffee)
+        try{
+            val coffeeWrapper = CoffeeWrapper(coffee.originName, coffee.popular, coffee.roastedDate, coffee.userId)
+            val createdCoffee = CoffeeApi.service.create(coffeeWrapper)
+            coffeeDao.insert(createdCoffee)
+
             return Result.Success(createdCoffee)
-        } catch (e: Exception) {
-            Log.w(TAG, "save - failed", e)
+        } catch(e: Exception){
+            Log.d("save","failed to save on server")
+            coffeeDao.insert(coffee)
+            Log.d("save","saved locally ${coffee.originName}")
+            saveWhenPossible(coffee._id)
+            Log.d("save","send to be saved on server")
             return Result.Error(e)
         }
     }
 
     suspend fun update(coffee: Coffee): Result<Coffee> {
-        try {
-            Log.v(TAG, "update - started")
+        try{
             val updatedCoffee = CoffeeApi.service.update(coffee._id, coffee)
-            val index = cachedItems?.indexOfFirst { it._id == coffee._id }
-            if (index != null) {
-                cachedItems?.set(index, updatedCoffee)
-            }
-            Log.v(TAG, "update - succeeded")
+            coffeeDao.update(updatedCoffee)
             return Result.Success(updatedCoffee)
-        } catch (e: Exception) {
-            Log.v(TAG, "update - failed")
+        } catch(e: Exception) {
+            coffeeDao.update(coffee)
             return Result.Error(e)
         }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun saveWhenPossible(coffeeId: String) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val inputData = Data.Builder()
+            .put("coffeeId",coffeeId)
+            .build()
+        val myWork = OneTimeWorkRequest.Builder(SaveService::class.java)
+            .setConstraints(constraints)
+            .setInputData(inputData)
+            .build()
+        WorkManager.getInstance().enqueue(myWork);
     }
 }
