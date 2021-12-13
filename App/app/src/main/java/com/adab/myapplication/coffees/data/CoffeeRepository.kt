@@ -41,7 +41,7 @@ class CoffeeRepository(private val coffeeDao: CoffeeDao) {
             Log.d("save","failed to save on server")
             coffeeDao.insert(coffee)
             Log.d("save","saved locally ${coffee.originName}")
-            saveWhenPossible(coffee._id)
+            saveInBackground(coffee._id)
             Log.d("save","send to be saved on server")
             return Result.Error(e)
         }
@@ -52,21 +52,41 @@ class CoffeeRepository(private val coffeeDao: CoffeeDao) {
             val updatedCoffee = CoffeeApi.service.update(coffee._id, coffee)
             coffeeDao.update(updatedCoffee)
             return Result.Success(updatedCoffee)
+
         } catch(e: Exception) {
+            Log.d("update","failed to edit on server")
             coffeeDao.update(coffee)
+            Log.d("update","edited locally id ${coffee._id}")
+            updateInBackground(coffee._id)
+            Log.d("update","send to be saved on server")
             return Result.Error(e)
         }
     }
 
     @SuppressLint("RestrictedApi")
-    private fun saveWhenPossible(coffeeId: String) {
+    private fun saveInBackground(coffeeId: String) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
         val inputData = Data.Builder()
             .put("coffeeId",coffeeId)
             .build()
-        val myWork = OneTimeWorkRequest.Builder(SaveService::class.java)
+        val myWork = OneTimeWorkRequest.Builder(SaveBackground::class.java)
+            .setConstraints(constraints)
+            .setInputData(inputData)
+            .build()
+        WorkManager.getInstance().enqueue(myWork);
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun updateInBackground(coffeeId: String) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val inputData = Data.Builder()
+            .put("coffeeId",coffeeId)
+            .build()
+        val myWork = OneTimeWorkRequest.Builder(UpdateBackground::class.java)
             .setConstraints(constraints)
             .setInputData(inputData)
             .build()

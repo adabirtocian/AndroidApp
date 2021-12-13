@@ -10,10 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class SaveService(
-    context: Context,
-    workerParams: WorkerParameters
-) : Worker(context, workerParams)  {
+class SaveBackground(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams)  {
 
     override fun doWork(): Result {
         Log.d("SaveWorker","Started")

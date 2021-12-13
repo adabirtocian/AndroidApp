@@ -44,13 +44,15 @@ class CoffeeEditFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.i(TAG, "onViewCreated")
         setupViewModel()
+
         binding.fab.setOnClickListener {
-            Log.v(TAG, "save item")
+            Log.v(TAG, "save item " + coffee.toString())
             val c = coffee
             if(c != null) {
                 c.originName = binding.itemText.text.toString()
                 c.popular = binding.itemPopular.text.toString()
                 c.roastedDate = binding.itemDate.text.toString()
+                viewModel.saveOrUpdateItem(c)
             }
         }
         binding.itemText.setText(coffeeId)
@@ -96,6 +98,7 @@ class CoffeeEditFragment : Fragment() {
                     binding.itemText.setText(it.originName)
                     binding.itemPopular.setText(it.popular)
                     binding.itemDate.setText(it.roastedDate)
+                    Log.d("setupViewModel", coffee.toString())
                 }
             })
         }

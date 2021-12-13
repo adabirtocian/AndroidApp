@@ -31,6 +31,7 @@ abstract class CoffeesDatabase : RoomDatabase() {
                     "coffees_db"
                 )
                     .addCallback(WordDatabaseCallback(scope))
+                    .allowMainThreadQueries()
                     .build()
             INSTANCE = instance
             return instance
