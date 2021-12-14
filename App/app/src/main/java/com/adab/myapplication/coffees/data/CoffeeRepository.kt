@@ -16,10 +16,10 @@ class CoffeeRepository(private val coffeeDao: CoffeeDao) {
     suspend fun refresh(): Result<Boolean> {
         try {
             val coffees = CoffeeApi.service.find()
+
             for(coffee in coffees) {
                 coffeeDao.insert(coffee)
             }
-
             return Result.Success(true)
         }catch (e: Exception) {
             return Result.Error(e)
@@ -32,15 +32,13 @@ class CoffeeRepository(private val coffeeDao: CoffeeDao) {
 
     suspend fun save(coffee: Coffee): Result<Coffee> {
         try{
-            val coffeeWrapper = CoffeeWrapper(coffee.originName, coffee.popular, coffee.roastedDate, coffee.userId)
-            val createdCoffee = CoffeeApi.service.create(coffeeWrapper)
+            val createdCoffee = CoffeeApi.service.create(coffee)
             coffeeDao.insert(createdCoffee)
-
             return Result.Success(createdCoffee)
         } catch(e: Exception){
             Log.d("save","failed to save on server")
             coffeeDao.insert(coffee)
-            Log.d("save","saved locally ${coffee.originName}")
+            Log.d("save","saved locally ${coffee._id} ${coffee.originName}")
             saveInBackground(coffee._id)
             Log.d("save","send to be saved on server")
             return Result.Error(e)

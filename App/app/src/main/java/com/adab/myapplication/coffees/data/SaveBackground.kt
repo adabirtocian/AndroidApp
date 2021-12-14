@@ -27,15 +27,15 @@ class SaveBackground(context: Context, workerParams: WorkerParameters) : Worker(
         val coffee = coffeeDao.getByIdCoffee(coffeeId)
         coffeeDao.deleteById(coffeeId)
         if (coffee != null) {
-            coffee._id=""//(coffeeDao.getSize()+1).toString()
+            coffee._id=(coffeeDao.getSize()+1).toString()
         }
-        Log.d("SaveWorker", "")
+        Log.d("SaveWorker", coffeeDao.getSize().toString())
 
         Log.d("SaveWorker", "Returned item $coffee")
         if (coffee != null) {
             GlobalScope.launch (Dispatchers.Main) {
-                val coffeeWrapper = CoffeeWrapper(coffee.originName, coffee.popular, coffee.roastedDate, coffee.userId)
-                val createdItem = CoffeeApi.service.create(coffeeWrapper)
+
+                val createdItem = CoffeeApi.service.create(coffee)
                 coffeeDao.insert(createdItem)
             }
             Log.d("SaveWorker", "Saved $coffee")

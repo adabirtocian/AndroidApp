@@ -26,9 +26,9 @@ class CoffeeEditViewModel(application: Application) : AndroidViewModel(applicati
         coffeeRepository = CoffeeRepository((coffeeDao))
     }
 
-    fun getCoffeeById(cofffeId: String): LiveData<Coffee>{
+    fun getCoffeeById(coffeeId: String): LiveData<Coffee>{
         Log.v(TAG, "getCoffeeById")
-        return coffeeRepository.getById(cofffeId)
+        return coffeeRepository.getById(coffeeId)
     }
 
     fun saveOrUpdateItem(coffee: Coffee) {
@@ -38,7 +38,8 @@ class CoffeeEditViewModel(application: Application) : AndroidViewModel(applicati
             mutableException.value = null
             val result: Result<Coffee>
 
-            if(coffee._id.isNotEmpty()) {
+            if(coffee._id != "-1") {
+                Log.d("id=-1 update ", coffee.toString())
                 result = coffeeRepository.update(coffee)
             } else {
                 result = coffeeRepository.save(coffee)

@@ -46,7 +46,7 @@ class CoffeeEditFragment : Fragment() {
         setupViewModel()
 
         binding.fab.setOnClickListener {
-            Log.v(TAG, "save item " + coffee.toString())
+            Log.v(TAG, "save coffee " + coffee.toString())
             val c = coffee
             if(c != null) {
                 c.originName = binding.itemText.text.toString()
@@ -89,7 +89,7 @@ class CoffeeEditFragment : Fragment() {
         })
         val id = coffeeId
         if (id == null) {
-            coffee = Coffee("","","","", "")
+            coffee = Coffee("-1","","","", "")
         } else {
             viewModel.getCoffeeById(id).observe(viewLifecycleOwner, {
                 Log.v(TAG, "update coffees")

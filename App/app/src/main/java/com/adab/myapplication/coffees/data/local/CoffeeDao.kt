@@ -30,4 +30,7 @@ interface CoffeeDao {
     @Query("DELETE FROM coffees WHERE _id=:id")
     fun deleteById(id:String?)
 
+    @Query("SELECT COUNT(*) FROM coffees")
+    fun getSize(): Int
+
 }

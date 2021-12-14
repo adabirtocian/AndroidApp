@@ -14,7 +14,7 @@ class UpdateBackground(context: Context, workerParams: WorkerParameters) : Worke
 
     override fun doWork(): Result {
         Log.d("UpdateBackground","Started")
-        val coffeeId = inputData.getString("itemId");
+        val coffeeId = inputData.getString("coffeeId");
         Log.d("UpdateBackground","CoffeeId: $coffeeId")
 
         val coffeeDao = CoffeesDatabase.getDatabase(applicationContext, GlobalScope).coffeeDao()

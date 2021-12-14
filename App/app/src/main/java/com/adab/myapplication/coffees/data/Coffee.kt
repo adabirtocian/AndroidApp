@@ -13,5 +13,5 @@ data class Coffee (
     @ColumnInfo(name = "roastedDate") var roastedDate: String,
     @ColumnInfo(name = "userId") var userId: String
     ){
-    override fun toString(): String = "$originName $popular $roastedDate"
+    override fun toString(): String = "$originName $popular $roastedDate $_id"
 }

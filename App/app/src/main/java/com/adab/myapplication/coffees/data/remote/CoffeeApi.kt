@@ -10,12 +10,9 @@ object CoffeeApi {
         @GET("/api/coffee")
         suspend fun find(): List<Coffee>
 
-        @GET("/api/coffee/{id}")
-        suspend fun read(@Path("id") coffeeId: String): Coffee;
-
         @Headers("Content-Type: application/json")
         @POST("/api/coffee")
-        suspend fun create(@Body coffee: CoffeeWrapper): Coffee
+        suspend fun create(@Body coffee: Coffee): Coffee
 
         @Headers("Content-Type: application/json")
         @PUT("/api/coffee/{id}")
