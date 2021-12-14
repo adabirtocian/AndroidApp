@@ -50,7 +50,6 @@ class CoffeeListFragment : Fragment() {
         coffeesModel.coffees.observe(viewLifecycleOwner, { value ->
             Log.i(TAG, "update coffees")
             coffeeListAdapter.items = value
-            Log.d("setup ", value.toString())
         })
         coffeesModel.loading.observe(viewLifecycleOwner, { loading ->
             Log.i(TAG, "update loading")

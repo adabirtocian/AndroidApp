@@ -1,7 +1,6 @@
 package com.adab.myapplication.coffees.data.remote
 
 import com.adab.myapplication.coffees.data.Coffee
-import com.adab.myapplication.coffees.data.CoffeeWrapper
 import com.adab.myapplication.core.Api
 import retrofit2.http.*
 
