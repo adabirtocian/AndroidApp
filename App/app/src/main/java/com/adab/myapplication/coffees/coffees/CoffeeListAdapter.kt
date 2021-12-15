@@ -26,7 +26,7 @@ class CoffeeListAdapter (
 
     private var onItemClick: View.OnClickListener = View.OnClickListener { view ->
         val item = view.tag as Coffee
-        fragment.findNavController().navigate(R.id.CoffeeEditFragment, Bundle().apply {
+        fragment.findNavController().navigate(R.id.action_CoffeeListFragment_to_CoffeeEditFragment, Bundle().apply {
             putString(CoffeeEditFragment.COFFEE_ID, item._id)
         })
     };
