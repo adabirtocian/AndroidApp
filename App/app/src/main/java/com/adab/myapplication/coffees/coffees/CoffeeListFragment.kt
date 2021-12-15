@@ -1,6 +1,7 @@
 package com.adab.myapplication.coffees.coffees
 
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.adab.myapplication.R
+import com.adab.myapplication.Sensors
 import com.adab.myapplication.auth.data.AuthRepository
 import com.adab.myapplication.databinding.FragmentCoffeeListBinding
 import com.adab.myapplication.core.TAG
@@ -42,11 +44,16 @@ class CoffeeListFragment : Fragment() {
             Log.v(TAG, "add new coffee")
             findNavController().navigate(R.id.CoffeeEditFragment)
         }
+        binding.sensors.setOnClickListener {
+            Log.v(TAG, "sensors")
+            val intent = Intent(context, Sensors::class.java)
+            startActivity(intent)
+        }
         changeFabPositionByObjectAnimator()
     }
 
     private fun changeFabPositionByObjectAnimator() {
-        ObjectAnimator.ofFloat(binding.fab, "translationX", -200f).apply {
+        ObjectAnimator.ofFloat(binding.fab, "translationY", -200f).apply {
             duration = 5000
             start()
         }
