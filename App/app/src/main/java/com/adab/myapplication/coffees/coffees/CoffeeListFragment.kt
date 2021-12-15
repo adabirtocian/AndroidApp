@@ -1,5 +1,6 @@
 package com.adab.myapplication.coffees.coffees
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -40,6 +41,14 @@ class CoffeeListFragment : Fragment() {
         binding.fab.setOnClickListener {
             Log.v(TAG, "add new coffee")
             findNavController().navigate(R.id.CoffeeEditFragment)
+        }
+        changeFabPositionByObjectAnimator()
+    }
+
+    private fun changeFabPositionByObjectAnimator() {
+        ObjectAnimator.ofFloat(binding.fab, "translationX", -200f).apply {
+            duration = 5000
+            start()
         }
     }
 

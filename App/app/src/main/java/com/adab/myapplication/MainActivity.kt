@@ -85,10 +85,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onLost(network: Network) {
-            Log.d(
-                TAG,
-                "The application no longer has a default network. The last default network was " + network
-            )
+            Log.d(TAG,"The application no longer has a default network. The last default network was " + network)
         }
 
         override fun onCapabilitiesChanged(
