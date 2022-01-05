@@ -16,12 +16,19 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.adab.myapplication.databinding.ActivityMainBinding
 import android.net.*
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var connectivityManager: ConnectivityManager
     private lateinit var connectivityLiveData: ConnectivityLiveData
+
+    private lateinit var sensorManager: SensorManager
+    private var geomagneticOrientation: Sensor? = null
 
     @SuppressLint("ObjectAnimatorBinding")
     @RequiresApi(Build.VERSION_CODES.M)
@@ -39,7 +46,38 @@ class MainActivity : AppCompatActivity() {
         connectivityLiveData.observe(this, {
             Log.d(TAG, "connectivityLiveData $it")
         })
+
+        // SENSORS
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        geomagneticOrientation = sensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)
     }
+
+    // ========== SENSORS start ==========
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+        Log.d(TAG, "onAccuracyChanged $accuracy");
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        val rotationX = event.values[0]
+        val rotationY = event.values[1]
+        val rotationZ = event.values[2]
+
+        Log.d(TAG, "onSensorChanged $rotationX $rotationY $rotationZ");
+    }
+
+    override fun onResume() {
+        super.onResume()
+        geomagneticOrientation?.also {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
+    // ========== SENSORS end ==========
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -85,10 +123,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onLost(network: Network) {
-            Log.d(
-                TAG,
-                "The application no longer has a default network. The last default network was " + network
-            )
+            Log.d(TAG,"The application no longer has a default network. The last default network was " + network)
         }
 
         override fun onCapabilitiesChanged(

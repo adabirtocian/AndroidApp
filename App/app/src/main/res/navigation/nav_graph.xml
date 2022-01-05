@@ -18,8 +18,12 @@
         tools:layout="@layout/fragment_coffee_list" >
 
         <action
-            android:id="@+id/action_CoffeeEditFragment_to_CoffeeListFragment"
-            app:destination="@id/CoffeeEditFragment" />
+            android:id="@+id/action_CoffeeListFragment_to_CoffeeEditFragment"
+            app:destination="@id/CoffeeEditFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"
+            app:popEnterAnim="@anim/slide_in"
+            app:popExitAnim="@anim/slide_out"/>
     </fragment>
 
     <fragment
