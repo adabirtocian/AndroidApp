@@ -10,3 +10,7 @@
  - Local storage for storing data fetched from server
  - Background tasks
  - System services
+ 
+# AndroidApp3  
+ - Sensors
+ - Animations
